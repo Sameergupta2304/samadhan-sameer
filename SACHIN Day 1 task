@@ -1,0 +1,12 @@
+const student = {
+  name: "Sachin Lodhi",
+  age: 18,
+  grade: "A",
+  subject: "Computer Science- Artificial Intelligence & Data Science"
+};
+
+console.log("Student Details:");
+console.log("Name: " + student.name);
+console.log("Age: " + student.age);
+console.log("Grade: " + student.grade);
+console.log("Subject: " + student.subject);

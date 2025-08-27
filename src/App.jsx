@@ -1,13 +1,11 @@
-// src/App.jsx
-
 import React from 'react';
-import TodoList from './day-8-task.jsx'; // Import your component
-import './App.css'; // Optional: for basic styling
+import StudentDirectory from './day-9-task.jsx'; 
+import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <TodoList /> {/* Render your component here */}
+      <StudentDirectory />
     </div>
   );
 }

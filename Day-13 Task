@@ -1,0 +1,75 @@
+const express = require('express');
+const cors = require('cors');
+const { MongoClient, ObjectId } = require('mongodb');
+
+const app = express();
+const PORT = 3000;
+
+const url = 'mongodb://localhost:27017';
+const dbName = 'notesApp';
+let db;
+
+app.use(cors());
+app.use(express.json());
+
+MongoClient.connect(url)
+    .then(client => {
+        console.log('Successfully connected to MongoDB');
+        db = client.db(dbName);
+        app.listen(PORT, () => {
+            console.log(`Backend server is running on http://localhost:${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('Failed to connect to MongoDB', err);
+        process.exit(1);
+    });
+
+// GET /notes: Retrieve all notes
+app.get('/notes', async (req, res) => {
+    try {
+        const notes = await db.collection('notes').find({}).toArray();
+        res.json(notes);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch notes' });
+    }
+});
+
+// POST /notes: Create a new note
+app.post('/notes', async (req, res) => {
+    try {
+        const { title, content } = req.body;
+        if (!title || !content) {
+            return res.status(400).json({ message: 'Title and content are required' });
+        }
+        
+        const newNote = { title, content, createdAt: new Date() };
+        const result = await db.collection('notes').insertOne(newNote);
+        
+        // This is the line that was fixed
+        res.status(201).json({ _id: result.insertedId, ...newNote });
+
+    } catch (err) {
+        console.error('Error creating note:', err); // Log the actual error
+        res.status(500).json({ message: 'Failed to create note' });
+    }
+});
+
+// DELETE /notes/:id: Delete a note
+app.delete('/notes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid note ID format' });
+        }
+        const result = await db.collection('notes').deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+        res.status(200).json({ message: 'Note deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete note' });
+    }
+});
+

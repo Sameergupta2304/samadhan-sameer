@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 17: Real-time Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <!-- Username Modal -->
+    <div id="username-modal" class="bg-white p-8 rounded-lg shadow-lg text-center">
+        <h2 class="text-2xl font-bold mb-4">Enter Your Name</h2>
+        <form id="username-form">
+            <input type="text" id="username-input" placeholder="Your name..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+            <button type="submit" class="w-full mt-4 bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                Start Chatting
+            </button>
+        </form>
+    </div>
+
+    <!-- Chat Container -->
+    <div id="chat-container" class="hidden flex flex-col w-full h-full sm:h-[90vh] sm:max-w-2xl bg-white sm:rounded-xl shadow-2xl">
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white p-4 flex items-center justify-between sm:rounded-t-xl shadow-md">
+            <div>
+                <h1 class="text-xl font-bold">Chat with AI Bot</h1>
+                <div class="flex items-center">
+                    <span class="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
+                    <p id="user-status" class="text-sm">Alex - Online</p>
+                </div>
+            </div>
+            <div id="current-user" class="text-right">
+                <!-- Current user name will be injected here -->
+            </div>
+        </header>
+
+        <!-- Messages -->
+        <main id="chat-messages" class="flex-1 p-6 overflow-y-auto bg-gray-50">
+            <!-- Chat messages will be appended here -->
+        </main>
+
+        <!-- Message Input -->
+        <footer class="p-4 bg-white border-t sm:rounded-b-xl">
+             <div id="typing-indicator" class="h-6 text-sm text-gray-500 italic"></div>
+            <form id="message-form" class="flex items-center">
+                <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" autocomplete="off" disabled>
+                <button type="submit" id="send-button" class="bg-indigo-600 text-white px-6 py-2 rounded-r-lg font-semibold hover:bg-indigo-700 transition-colors" disabled>
+                    Send
+                </button>
+            </form>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const usernameModal = document.getElementById('username-modal');
+            const usernameForm = document.getElementById('username-form');
+            const usernameInput = document.getElementById('username-input');
+            
+            const chatContainer = document.getElementById('chat-container');
+            const currentUserEl = document.getElementById('current-user');
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageForm = document.getElementById('message-form');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const typingIndicator = document.getElementById('typing-indicator');
+
+            let username = '';
+            let chatHistory = [];
+            let isAiThinking = false;
+
+            // --- USERNAME SETUP ---
+            usernameForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = usernameInput.value.trim();
+                if (name) {
+                    username = name;
+                    currentUserEl.innerHTML = `<p class="font-semibold">${username}</p><p class="text-xs text-indigo-200">You</p>`;
+                    usernameModal.classList.add('hidden');
+                    chatContainer.classList.remove('hidden');
+                    chatContainer.classList.add('flex');
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    addMessage('Welcome! I\'m Alex, your AI chat partner. What\'s on your mind?', 'Alex', false);
+                }
+            });
+
+            // --- MESSAGE HANDLING ---
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const messageText = messageInput.value.trim();
+                if (messageText && !isAiThinking) {
+                    addMessage(messageText, username, true);
+                    messageInput.value = '';
+                    getAiReply();
+                }
+            });
+
+            function addMessage(text, sender, isSelf) {
+                // Add to chat history for AI context
+                chatHistory.push({
+                    role: isSelf ? 'user' : 'model',
+                    parts: [{ text: text }]
+                });
+
+                const messageWrapper = document.createElement('div');
+                messageWrapper.className = `flex mb-4 ${isSelf ? 'justify-end' : 'justify-start'}`;
+                
+                const senderName = isSelf ? 'You' : sender;
+
+                const messageEl = document.createElement('div');
+                messageEl.className = `max-w-xs md:max-w-md p-3 rounded-lg shadow ${isSelf ? 'bg-indigo-500 text-white' : 'bg-white text-gray-800'}`;
+
+                if (sender !== 'System' && !isSelf) {
+                    messageEl.innerHTML = `<p class="text-sm font-semibold mb-1 text-gray-600">${senderName}</p>`;
+                } else {
+                     messageEl.innerHTML = ``;
+                }
+
+                const messageTextNode = document.createElement('p');
+                messageTextNode.textContent = text;
+                messageEl.appendChild(messageTextNode);
+
+                messageWrapper.appendChild(messageEl);
+                messagesContainer.appendChild(messageWrapper);
+
+                // Scroll to the bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            async function getAiReply() {
+                isAiThinking = true;
+                typingIndicator.textContent = 'Alex is typing...';
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+
+                const apiKey = ""; // Canvas will provide this
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                // Define the bot's persona
+                const systemInstruction = {
+                    parts: [{text: "You are Alex, a friendly and helpful chat companion. Keep your responses concise and conversational."}]
+                };
+
+                const payload = {
+                    contents: chatHistory,
+                    systemInstruction: systemInstruction
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (aiText) {
+                        addMessage(aiText, 'Alex', false);
+                    } else {
+                        addMessage("Sorry, I couldn't think of a response. Try asking something else.", 'Alex', false);
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
+                    addMessage("Oops! Something went wrong on my end. Please try again in a moment.", 'Alex', false);
+                } finally {
+                    isAiThinking = false;
+                    typingIndicator.textContent = '';
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

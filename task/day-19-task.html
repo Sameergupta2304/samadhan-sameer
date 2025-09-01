@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 19: Social Media Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .like-btn.liked .fa-heart {
+            color: #ef4444; /* red-500 */
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+        
+        <!-- Header & Profile Section -->
+        <header class="bg-white p-6 rounded-2xl shadow-md mb-8">
+            <div class="flex items-center space-x-6">
+                <img src="https://placehold.co/100x100/14b8a6/ffffff?text=SG" alt="User Avatar" class="w-24 h-24 rounded-full border-4 border-teal-300">
+                <div>
+                    <h1 class="text-3xl font-bold">Sameer Gupta</h1>
+                    <p class="text-gray-500">@sameer_gupta</p>
+                    <p class="mt-2 text-gray-600">Frontend Developer & UI/UX enthusiast. Turning ideas into beautiful, interactive web experiences.</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Feed -->
+        <main id="post-feed">
+
+            <!-- Post 1 -->
+            <div class="post bg-white p-6 rounded-2xl shadow-md mb-6">
+                <!-- Post Header -->
+                <div class="flex items-center mb-4">
+                    <img src="https://placehold.co/50x50/14b8a6/ffffff?text=SG" alt="User Avatar" class="w-12 h-12 rounded-full">
+                    <div class="ml-4">
+                        <p class="font-semibold">Sameer Gupta</p>
+                        <p class="text-sm text-gray-500">2 hours ago</p>
+                    </div>
+                </div>
+                <!-- Post Body -->
+                <p class="mb-4">Just finished building this awesome social media dashboard! It's amazing what you can create with Tailwind CSS and a bit of JavaScript. Loving the clean look. #webdev #coding #100DaysOfCode</p>
+                <img src="https://placehold.co/600x400/99f6e4/134e4a?text=Dashboard+Screenshot" alt="Post Image" class="rounded-lg w-full">
+                <!-- Post Actions -->
+                <div class="flex items-center justify-between text-gray-500 mt-4 border-t pt-4">
+                    <button class="like-btn flex items-center space-x-2 hover:text-red-500 transition-colors">
+                        <i class="fa-regular fa-heart"></i>
+                        <span class="like-count">18</span>
+                        <span>Likes</span>
+                    </button>
+                    <button class="comment-btn flex items-center space-x-2 hover:text-teal-600 transition-colors">
+                        <i class="fa-regular fa-comment"></i>
+                        <span>2 Comments</span>
+                    </button>
+                    <button class="share-btn flex items-center space-x-2 hover:text-teal-600 transition-colors">
+                        <i class="fa-regular fa-share-square"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+                <!-- Comments Section (Initially hidden) -->
+                <div class="comments-section hidden mt-4 pl-6 border-l-2">
+                    <div class="comment mb-3">
+                        <p><strong class="font-semibold">Jane Smith:</strong> This looks fantastic! Great job.</p>
+                    </div>
+                    <div class="comment mb-3">
+                        <p><strong class="font-semibold">Mike Lee:</strong> Super clean UI. Can you share the code?</p>
+                    </div>
+                    <form class="comment-form flex gap-2 mt-4">
+                        <input type="text" class="flex-grow p-2 border rounded-lg text-sm" placeholder="Write a comment...">
+                        <button type="submit" class="bg-teal-500 text-white font-semibold text-sm py-2 px-4 rounded-lg hover:bg-teal-600">Post</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Post 2 -->
+            <div class="post bg-white p-6 rounded-2xl shadow-md mb-6">
+                <!-- Post Header -->
+                <div class="flex items-center mb-4">
+                     <img src="https://placehold.co/50x50/14b8a6/ffffff?text=SG" alt="User Avatar" class="w-12 h-12 rounded-full">
+                    <div class="ml-4">
+                        <p class="font-semibold">Sameer Gupta</p>
+                        <p class="text-sm text-gray-500">1 day ago</p>
+                    </div>
+                </div>
+                <!-- Post Body -->
+                <p class="mb-4">Exploring the city and found this hidden gem. The architecture is just breathtaking! 🏙️✨</p>
+                 <!-- Post Actions -->
+                <div class="flex items-center justify-between text-gray-500 mt-4 border-t pt-4">
+                    <button class="like-btn flex items-center space-x-2 hover:text-red-500 transition-colors">
+                        <i class="fa-regular fa-heart"></i>
+                        <span class="like-count">42</span>
+                        <span>Likes</span>
+                    </button>
+                    <button class="comment-btn flex items-center space-x-2 hover:text-teal-600 transition-colors">
+                        <i class="fa-regular fa-comment"></i>
+                        <span>5 Comments</span>
+                    </button>
+                    <button class="share-btn flex items-center space-x-2 hover:text-teal-600 transition-colors">
+                        <i class="fa-regular fa-share-square"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+                <!-- Comments Section (Initially hidden) -->
+                <div class="comments-section hidden mt-4 pl-6 border-l-2">
+                    <!-- comments will be added here -->
+                     <form class="comment-form flex gap-2 mt-4">
+                        <input type="text" class="flex-grow p-2 border rounded-lg text-sm" placeholder="Write a comment...">
+                        <button type="submit" class="bg-teal-500 text-white font-semibold text-sm py-2 px-4 rounded-lg hover:bg-teal-600">Post</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const postFeed = document.getElementById('post-feed');
+
+            postFeed.addEventListener('click', (e) => {
+                // --- Like Button Logic ---
+                const likeBtn = e.target.closest('.like-btn');
+                if (likeBtn) {
+                    likeBtn.classList.toggle('liked');
+                    const heartIcon = likeBtn.querySelector('.fa-heart');
+                    const likeCountSpan = likeBtn.querySelector('.like-count');
+                    let currentLikes = parseInt(likeCountSpan.textContent);
+                    
+                    if (likeBtn.classList.contains('liked')) {
+                        heartIcon.classList.remove('fa-regular');
+                        heartIcon.classList.add('fa-solid');
+                        currentLikes++;
+                    } else {
+                        heartIcon.classList.remove('fa-solid');
+                        heartIcon.classList.add('fa-regular');
+                        currentLikes--;
+                    }
+                    likeCountSpan.textContent = currentLikes;
+                }
+
+                // --- Comment Button Logic ---
+                const commentBtn = e.target.closest('.comment-btn');
+                if (commentBtn) {
+                    const post = commentBtn.closest('.post');
+                    const commentsSection = post.querySelector('.comments-section');
+                    commentsSection.classList.toggle('hidden');
+                }
+            });
+
+            postFeed.addEventListener('submit', (e) => {
+                // --- Add Comment Logic ---
+                if (e.target.classList.contains('comment-form')) {
+                    e.preventDefault();
+                    const form = e.target;
+                    const input = form.querySelector('input[type="text"]');
+                    const commentText = input.value.trim();
+
+                    if (commentText) {
+                        const newComment = document.createElement('div');
+                        newComment.className = 'comment mb-3';
+                        newComment.innerHTML = `<p><strong class="font-semibold">You:</strong> ${escapeHTML(commentText)}</p>`;
+                        
+                        // Insert the new comment before the form
+                        form.parentNode.insertBefore(newComment, form);
+                        input.value = '';
+                    }
+                }
+            });
+        });
+        
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(match) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[match];
+            });
+        }
+    </script>
+
+</body>
+</html>

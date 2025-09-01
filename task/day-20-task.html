@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 20: Weather App with Maps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- LeafletJS for Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #map {
+            height: 400px;
+            border-radius: 1rem; /* rounded-2xl */
+        }
+        .weather-card {
+            background: linear-gradient(to top right, #6366f1, #a855f7);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Weather Dashboard</h1>
+
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <form id="search-form" class="flex gap-2">
+                <input type="text" id="city-input" placeholder="Enter city name..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition">
+                <button type="submit" class="bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-600 transition">Search</button>
+            </form>
+        </div>
+        
+        <div id="loading" class="text-center text-gray-500">
+            <p>Fetching weather data...</p>
+        </div>
+
+        <div id="error" class="hidden text-center text-red-500 bg-red-100 p-4 rounded-lg">
+            <p>Could not fetch weather data. Please try another city or enable location access.</p>
+        </div>
+
+        <!-- Main Content (Weather + Map) -->
+        <div id="content" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Weather Info Card -->
+            <div class="weather-card text-white p-8 rounded-2xl shadow-xl flex flex-col justify-between">
+                <div>
+                    <h2 id="city-name" class="text-4xl font-bold">City Name</h2>
+                    <p id="weather-description" class="text-lg opacity-80 mt-1">Weather Description</p>
+                </div>
+                <div class="flex items-center justify-between mt-8">
+                    <div id="weather-icon" class="text-7xl">☀️</div>
+                    <div class="text-right">
+                        <p id="temperature" class="text-6xl font-bold">25°C</p>
+                        <p id="wind" class="mt-1 opacity-80">Wind: 10 km/h</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div id="map" class="shadow-lg"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('search-form');
+            const cityInput = document.getElementById('city-input');
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const contentEl = document.getElementById('content');
+            
+            // UI elements to update
+            const cityNameEl = document.getElementById('city-name');
+            const weatherDescEl = document.getElementById('weather-description');
+            const tempEl = document.getElementById('temperature');
+            const windEl = document.getElementById('wind');
+            const weatherIconEl = document.getElementById('weather-icon');
+
+            let map;
+            let marker;
+
+            // Initialize map
+            function initMap(lat, lon, name) {
+                if (map) {
+                    map.setView([lat, lon], 13);
+                } else {
+                    map = L.map('map').setView([lat, lon], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Add a click event listener to the map
+                    map.on('click', (e) => {
+                        fetchWeatherByCoords(e.latlng.lat, e.latlng.lng);
+                    });
+                }
+
+                if (marker) {
+                    marker.setLatLng([lat, lon]);
+                } else {
+                    marker = L.marker([lat, lon]).addTo(map);
+                }
+                marker.bindPopup(`<b>${name}</b>`).openPopup();
+            }
+
+            // Update UI with weather data
+            function updateUI(data, cityName) {
+                const { temperature, windspeed, weathercode } = data.current_weather;
+                const { description, icon } = getWeatherDetails(weathercode);
+
+                cityNameEl.textContent = cityName;
+                weatherDescEl.textContent = description;
+                tempEl.textContent = `${Math.round(temperature)}°C`;
+                windEl.textContent = `Wind: ${windspeed} km/h`;
+                weatherIconEl.textContent = icon;
+                
+                loadingEl.classList.add('hidden');
+                errorEl.classList.add('hidden');
+                contentEl.classList.remove('hidden');
+            }
+
+            // Fetch weather data by city name
+            async function fetchWeatherByCity(city) {
+                loadingEl.classList.remove('hidden');
+                errorEl.classList.add('hidden');
+                contentEl.classList.add('hidden');
+
+                try {
+                    // 1. Geocode city name to get lat/lon
+                    const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`);
+                    if (!geoResponse.ok) throw new Error('City not found');
+                    const geoData = await geoResponse.json();
+                    if (!geoData.results || geoData.results.length === 0) throw new Error('City not found');
+                    
+                    const { latitude, longitude, name } = geoData.results[0];
+
+                    // 2. Fetch weather for the coordinates
+                    const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+                    if (!weatherResponse.ok) throw new Error('Weather data unavailable');
+                    const weatherData = await weatherResponse.json();
+
+                    updateUI(weatherData, name);
+                    initMap(latitude, longitude, name);
+
+                } catch (err) {
+                    console.error(err);
+                    loadingEl.classList.add('hidden');
+                    errorEl.querySelector('p').textContent = 'Could not fetch weather data. Please try another city.';
+                    errorEl.classList.remove('hidden');
+                }
+            }
+
+            // NEW FUNCTION: Fetch weather data by coordinates (for map clicks)
+            async function fetchWeatherByCoords(lat, lon) {
+                loadingEl.classList.remove('hidden');
+                errorEl.classList.add('hidden');
+                contentEl.classList.add('hidden');
+
+                try {
+                    // Fetch weather and location name in parallel
+                    const [weatherResponse, locationResponse] = await Promise.all([
+                        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`),
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    ]);
+
+                    if (!weatherResponse.ok || !locationResponse.ok) {
+                        throw new Error('Data fetch failed for the clicked location.');
+                    }
+
+                    const weatherData = await weatherResponse.json();
+                    const locationData = await locationResponse.json();
+
+                    // Extract a readable name from the reverse geocoding response
+                    const address = locationData.address;
+                    const cityName = address.city || address.town || address.village || address.hamlet || "Selected Location";
+                    
+                    updateUI(weatherData, cityName);
+                    // Update map view and marker to the clicked location
+                    initMap(lat, lon, cityName);
+
+                } catch (err) {
+                    console.error(err);
+                    loadingEl.classList.add('hidden');
+                    errorEl.querySelector('p').textContent = 'Could not fetch weather for the selected map location.';
+                    errorEl.classList.remove('hidden');
+                }
+            }
+
+            // Event listener for search form
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const city = cityInput.value.trim();
+                if (city) {
+                    fetchWeatherByCity(city);
+                }
+            });
+
+            // Get user's location on initial load
+            function getInitialLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const { latitude, longitude } = position.coords;
+                            // Since we have coords, we can directly fetch weather
+                            const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+                            const weatherData = await weatherResponse.json();
+                            // For city name, we do a reverse lookup - we can use a simple trick here
+                            // by searching the geocoding API with the coordinates. For simplicity, we'll just show "Your Location"
+                            updateUI(weatherData, "Your Location");
+                            initMap(latitude, longitude, "Your Location");
+                        },
+                        () => {
+                            // Geolocation failed or denied, fetch default city
+                            fetchWeatherByCity('Bhopal');
+                        }
+                    );
+                } else {
+                    // Browser doesn't support geolocation
+                    fetchWeatherByCity('Bhopal');
+                }
+            }
+            
+             // WMO Weather interpretation codes
+            function getWeatherDetails(code) {
+                const codes = {
+                    0: { description: 'Clear sky', icon: '☀️' },
+                    1: { description: 'Mainly clear', icon: '🌤️' },
+                    2: { description: 'Partly cloudy', icon: '⛅️' },
+                    3: { description: 'Overcast', icon: '☁️' },
+                    45: { description: 'Fog', icon: '🌫️' },
+                    48: { description: 'Depositing rime fog', icon: '🌫️' },
+                    51: { description: 'Light drizzle', icon: '🌦️' },
+                    53: { description: 'Moderate drizzle', icon: '🌦️' },
+                    55: { description: 'Dense drizzle', icon: '🌦️' },
+                    61: { description: 'Slight rain', icon: '🌧️' },
+                    63: { description: 'Moderate rain', icon: '🌧️' },
+                    65: { description: 'Heavy rain', icon: '🌧️' },
+                    80: { description: 'Slight rain showers', icon: '🌦️' },
+                    81: { description: 'Moderate rain showers', icon: '🌦️' },
+                    82: { description: 'Violent rain showers', icon: '⛈️' },
+                    95: { description: 'Thunderstorm', icon: '⛈️' },
+                };
+                return codes[code] || { description: 'Clear sky', icon: '☀️' };
+            }
+
+            getInitialLocation();
+        });
+    </script>
+</body>
+</html>

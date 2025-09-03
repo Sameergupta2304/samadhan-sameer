@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 15: Full-Stack Auth</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Main App Component ---
+        const App = () => {
+            const [token, setToken] = useState(localStorage.getItem('auth-token'));
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [protectedData, setProtectedData] = useState(null);
+
+            // This effect runs when the component loads or the token changes.
+            useEffect(() => {
+                if (token) {
+                    fetchProtectedData();
+                } else {
+                    setProtectedData(null); // Clear data if logged out
+                }
+            }, [token]);
+
+            const API_URL = 'http://localhost:3000';
+
+            const fetchProtectedData = async () => {
+                setIsLoading(true);
+                setError('');
+                try {
+                    const res = await fetch(`${API_URL}/protected`, {
+                        headers: {
+                            // This is the crucial part for protected routes!
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!res.ok) {
+                        // This handles cases where the token is expired or invalid.
+                        if (res.status === 401 || res.status === 403) {
+                            handleLogout(); // Log the user out
+                        }
+                        throw new Error('Could not access protected content.');
+                    }
+                    const data = await res.json();
+                    setProtectedData(data);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const handleLogin = (newToken) => {
+                localStorage.setItem('auth-token', newToken);
+                setToken(newToken);
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('auth-token');
+                setToken(null);
+            };
+
+            // This is the "Protected Route" on the frontend.
+            // We conditionally render content based on whether a token exists.
+            return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                    <div className="w-full max-w-md">
+                        <h1 className="text-4xl font-bold text-center text-indigo-600 mb-6">Full-Stack Auth App</h1>
+                        
+                        {error && <p className="text-red-500 bg-red-100 p-3 rounded-md text-center mb-4">{error}</p>}
+
+                        {token ? (
+                            <ProtectedContent data={protectedData} onLogout={handleLogout} isLoading={isLoading} />
+                        ) : (
+                            <AuthForm onLogin={handleLogin} setError={setError} />
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Authentication Form Component ---
+        const AuthForm = ({ onLogin, setError }) => {
+            const [view, setView] = useState('login'); // 'login' or 'register'
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            
+            const API_URL = 'http://localhost:3000';
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setIsSubmitting(true);
+                const endpoint = view === 'login' ? '/login' : '/register';
+                
+                try {
+                    const res = await fetch(API_URL + endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.message || `Failed to ${view}`);
+                    }
+                    if (view === 'register') {
+                        setView('login');
+                        alert('Registration successful! Please log in.');
+                    } else {
+                        onLogin(data.token);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsSubmitting(false);
+                    setUsername('');
+                    setPassword('');
+                }
+            };
+
+            return (
+                <div className="bg-white p-8 rounded-lg shadow-xl">
+                    <div className="flex justify-center border-b mb-6">
+                        <button onClick={() => setView('login')} className={`py-2 px-6 text-lg font-medium ${view === 'login' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500'}`}>Login</button>
+                        <button onClick={() => setView('register')} className={`py-2 px-6 text-lg font-medium ${view === 'register' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500'}`}>Register</button>
+                    </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 mb-2">Username</label>
+                            <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+                        </div>
+                        <div className="mb-6">
+                            <label className="block text-gray-700 mb-2">Password</label>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+                        </div>
+                        <button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-300 disabled:bg-indigo-400 flex items-center justify-center">
+                            {isSubmitting ? <div className="spinner"></div> : (view === 'login' ? 'Login' : 'Register')}
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        // --- Protected Content Component ---
+        const ProtectedContent = ({ data, onLogout, isLoading }) => {
+            return (
+                <div className="bg-white p-8 rounded-lg shadow-xl text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Members-Only Area</h2>
+                    {isLoading && <div className="flex justify-center my-4"><div className="spinner"></div></div>}
+                    {data && (
+                        <div className="bg-indigo-50 p-4 rounded-md text-indigo-800">
+                            <p>{data.message}</p>
+                        </div>
+                    )}
+                    <button onClick={onLogout} className="mt-6 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition">Logout</button>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

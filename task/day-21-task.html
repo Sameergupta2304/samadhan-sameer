@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sameer Gupta | Professional Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .section {
+            padding: 6rem 1rem;
+        }
+        @media (min-width: 640px) {
+            .section {
+                padding: 6rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Header -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 shadow-md">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <a href="#" class="text-2xl font-bold text-cyan-400">SG.</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#about" class="hover:text-cyan-400 transition-colors">About</a>
+                <a href="#projects" class="hover:text-cyan-400 transition-colors">Projects</a>
+                <a href="#contact" class="hover:text-cyan-400 transition-colors">Contact</a>
+            </nav>
+            <a href="#contact" class="hidden md:block bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Hire Me</a>
+            <button id="mobile-menu-btn" class="md:hidden text-2xl z-50">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-0 left-0 w-full h-screen bg-gray-900">
+            <nav class="flex flex-col items-center justify-center h-full space-y-8 text-xl">
+                <a href="#about" class="mobile-link hover:text-cyan-400 transition-colors">About</a>
+                <a href="#projects" class="mobile-link hover:text-cyan-400 transition-colors">Projects</a>
+                <a href="#contact" class="mobile-link hover:text-cyan-400 transition-colors">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center bg-gray-900">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-4">
+                    Hi, I'm <span class="text-cyan-400">Sameer Gupta</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto">A passionate Frontend Developer creating modern and responsive web applications.</p>
+                <a href="#projects" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105">View My Work</a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section bg-gray-800">
+            <div class="container mx-auto text-center max-w-4xl">
+                <h2 class="text-4xl font-bold mb-6">About Me</h2>
+                <img src="https://placehold.co/150x150/14b8a6/0f172a?text=SG" alt="Sameer Gupta" class="w-40 h-40 rounded-full mx-auto mb-6 border-4 border-cyan-400">
+                <p class="text-lg text-gray-300">
+                    I am a dedicated web developer with a knack for creating beautiful and functional user interfaces. I have experience working with HTML, CSS, and JavaScript to build interactive and user-friendly websites. I am constantly learning and exploring new technologies to improve my skills and deliver high-quality results. This portfolio showcases some of the projects I've built.
+                </p>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section bg-gray-900">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12">My Projects</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project Card -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/0891b2/ffffff?text=E-commerce" alt="Project 1" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">E-commerce Store</h3>
+                            <p class="text-gray-400 mb-4">A complete front-end for an online store with a product catalog and shopping cart.</p>
+                            <a href="#" class="text-cyan-400 font-semibold hover:underline">View Project &rarr;</a>
+                        </div>
+                    </div>
+                    <!-- Project Card -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/0891b2/ffffff?text=Chat+App" alt="Project 2" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Real-time Chat App</h3>
+                            <p class="text-gray-400 mb-4">A chat application front-end with a simulated real-time messaging interface.</p>
+                             <a href="#" class="text-cyan-400 font-semibold hover:underline">View Project &rarr;</a>
+                        </div>
+                    </div>
+                    <!-- Project Card -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/0891b2/ffffff?text=Task+Manager" alt="Project 3" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Task Management System</h3>
+                            <p class="text-gray-400 mb-4">A Trello-like board with drag-and-drop functionality for managing tasks.</p>
+                             <a href="#" class="text-cyan-400 font-semibold hover:underline">View Project &rarr;</a>
+                        </div>
+                    </div>
+                     <!-- Project Card -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/0891b2/ffffff?text=Social+Dashboard" alt="Project 4" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Social Media Dashboard</h3>
+                            <p class="text-gray-400 mb-4">A UI for a social media feed with interactive posts, likes, and comments.</p>
+                             <a href="#" class="text-cyan-400 font-semibold hover:underline">View Project &rarr;</a>
+                        </div>
+                    </div>
+                     <!-- Project Card -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <img src="https://placehold.co/600x400/0891b2/ffffff?text=Weather+App" alt="Project 5" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Weather App with Maps</h3>
+                            <p class="text-gray-400 mb-4">A weather dashboard that uses APIs to fetch data and display it on a map.</p>
+                             <a href="#" class="text-cyan-400 font-semibold hover:underline">View Project &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section bg-gray-800">
+            <div class="container mx-auto max-w-3xl">
+                <h2 class="text-4xl font-bold text-center mb-12">Get In Touch</h2>
+                <form id="contact-form" class="space-y-6">
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium">Your Name</label>
+                        <input type="text" id="name" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block mb-2 text-sm font-medium">Your Email</label>
+                        <input type="email" id="email" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block mb-2 text-sm font-medium">Your Message</label>
+                        <textarea id="message" rows="5" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Send Message</button>
+                </form>
+                <div id="form-success" class="hidden mt-6 text-center text-green-400 bg-green-900/50 p-4 rounded-lg">
+                    <p>Thank you for your message! I'll get back to you soon.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-6">
+        <div class="container mx-auto text-center text-gray-400">
+            <div class="flex justify-center space-x-6 mb-4 text-2xl">
+                <a href="#" class="hover:text-cyan-400 transition-colors"><i class="fab fa-github"></i></a>
+                <a href="#" class="hover:text-cyan-400 transition-colors"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-cyan-400 transition-colors"><i class="fab fa-twitter"></i></a>
+            </div>
+            <p>&copy; 2025 Sameer Gupta. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuIcon = mobileMenuBtn.querySelector('i');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                if (mobileMenu.classList.contains('hidden')) {
+                    mobileMenuIcon.classList.remove('fa-times');
+                    mobileMenuIcon.classList.add('fa-bars');
+                } else {
+                    mobileMenuIcon.classList.remove('fa-bars');
+                    mobileMenuIcon.classList.add('fa-times');
+                }
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuIcon.classList.remove('fa-times');
+                    mobileMenuIcon.classList.add('fa-bars');
+                });
+            });
+
+            // Contact Form
+            const contactForm = document.getElementById('contact-form');
+            const formSuccess = document.getElementById('form-success');
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formSuccess.classList.remove('hidden');
+                contactForm.reset();
+                setTimeout(() => {
+                    formSuccess.classList.add('hidden');
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
